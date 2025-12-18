@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Red Advertising LLC - Mid-Century Modern Digital Strategy">
+    <title>Red Advertising LLC | The Draper of Digital</title>
+    
+
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Montserrat:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        red: { DEFAULT: '#E63946', dark: '#D62839' },
+                        mustard: '#E9C46A',
+                        teal: { DEFAULT: '#264653', light: '#2A9D8F' },
+                        sienna: '#F4A261',
+                        cream: '#F1FAEE',
+                        paper: '#Fdfbf7'
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', '"Abril Fatface"', 'serif'],
+                        sans: ['"Montserrat"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'retro': '6px 6px 0px 0px #264653',
+                        'retro-hover': '3px 3px 0px 0px #264653',
+                        'retro-red': '6px 6px 0px 0px #E63946',
+                        'retro-mustard': '6px 6px 0px 0px #E9C46A',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #F1FAEE; color: #264653; overflow-x: hidden; }
+        
+        .bubble-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; opacity: 0.15;
+            background-image: 
+                radial-gradient(circle at 15% 50%, #E63946 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, #E9C46A 0%, transparent 30%),
+                radial-gradient(circle at 50% 80%, #264653 0%, transparent 25%),
+                radial-gradient(circle at 80% 90%, #F4A261 0%, transparent 30%),
+                radial-gradient(circle at 10% 10%, #264653 0%, transparent 20%),
+                radial-gradient(circle at 90% 10%, #E63946 0%, transparent 15%),
+                radial-gradient(circle at 40% 40%, #E9C46A 0%, transparent 10%);
+            background-attachment: fixed; pointer-events: none;
+        }
+
+        .noise-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.05; pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+        }
+
+        section { content-visibility: auto; contain-intrinsic-size: 800px; }
+        
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin: 0 auto; height: 400px; max-height: 500px; }
+        @media (max-width: 768px) { .chart-container { height: 300px; max-height: 350px; } }
+
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #F1FAEE; }
+        ::-webkit-scrollbar-thumb { background: #E63946; border: 2px solid #F1FAEE; border-radius: 5px; }
+
+        .btn-click-effect:active { transform: translate(3px, 3px); box-shadow: 3px 3px 0px 0px #264653; }
+        .portfolio-item:hover .portfolio-img { transform: scale(1.02); }
+        
+        /* Transition classes */
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-mustard selection:text-teal">
+
+    <div class="bubble-bg"></div>
+    <div class="noise-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-cream/90 backdrop-blur-md border-b-4 border-teal py-4 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <a href="#" class="font-serif text-2xl md:text-3xl font-black text-red tracking-widest hover:text-teal transition-colors nav-link-home">
+                RED ADVERTISING
+            </a>
+            
+            <div class="hidden md:flex space-x-8 font-bold text-teal text-sm tracking-wider uppercase">
+                <a href="#strategy" class="hover:text-red hover:underline decoration-4 underline-offset-4 decoration-mustard transition-all nav-link-home">Approach</a>
+                <a href="#services" class="hover:text-red hover:underline decoration-4 underline-offset-4 decoration-mustard transition-all nav-link-home">Services</a>
+                <a href="#portfolio" class="hover:text-red hover:underline decoration-4 underline-offset-4 decoration-mustard transition-all nav-link-home">Portfolio</a>
+                <a href="#about" class="hover:text-red hover:underline decoration-4 underline-offset-4 decoration-mustard transition-all nav-link-home">The Man</a>
+                <button id="nav-cta" class="px-6 py-2 bg-red text-cream rounded-full shadow-retro hover:shadow-retro-hover hover:translate-x-[3px] hover:translate-y-[3px] transition-all btn-click-effect scroll-to-contact">Start Campaign</button>
+            </div>
+
+            <button id="mobile-menu-btn" class="md:hidden text-teal font-black text-2xl focus:outline-none">☰</button>
+        </div>
+        
+        <div id="mobile-menu" class="hidden md:hidden bg-cream border-t-2 border-teal absolute w-full shadow-xl">
+            <div class="flex flex-col p-6 space-y-4 font-bold text-teal uppercase text-center">
+                <a href="#strategy" class="py-2 hover:bg-mustard/20 nav-link-home">Approach</a>
+                <a href="#services" class="py-2 hover:bg-mustard/20 nav-link-home">Services</a>
+                <a href="#portfolio" class="py-2 hover:bg-mustard/20 nav-link-home">Portfolio</a>
+                <a href="#about" class="py-2 hover:bg-mustard/20 nav-link-home">The Man</a>
+                <button class="py-2 text-red font-bold scroll-to-contact">Start Campaign</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN HOME VIEW -->
+    <main id="home-view">
+        <!-- Hero -->
+        <header class="relative min-h-[90vh] flex items-center justify-center py-20 overflow-hidden">
+            <div class="absolute top-10 left-10 w-32 h-32 bg-mustard rounded-full opacity-80 mix-blend-multiply animate-[pulse_4s_ease-in-out_infinite]"></div>
+            <div class="absolute bottom-20 right-10 w-48 h-48 bg-red rounded-full opacity-60 mix-blend-multiply animate-[pulse_5s_ease-in-out_infinite]"></div>
+            <div class="absolute top-1/3 right-1/4 w-24 h-24 bg-teal rounded-full opacity-40 mix-blend-multiply"></div>
+
+            <div class="container mx-auto px-6 relative z-10 text-center">
+                <h1 class="font-serif text-5xl md:text-7xl lg:text-9xl font-black text-teal leading-tight mb-6 drop-shadow-sm">
+                    WE DON'T JUST <span class="text-red italic pr-2">SELL.</span><br>
+                    WE <span class="underline decoration-mustard decoration-[12px] underline-offset-8">SEDUCE.</span>
+                </h1>
+                <p class="font-sans text-lg md:text-2xl text-teal/80 max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
+                    Modern digital dominance with a classic touch.<br>
+                    Advertising, Design, and Strategy for the bold.
+                </p>
+                <div class="flex flex-col md:flex-row justify-center items-center gap-4">
+                    <a href="#strategy" class="group relative px-8 py-4 bg-teal text-cream font-bold text-lg rounded-full shadow-retro-red hover:shadow-retro-hover transition-all btn-click-effect overflow-hidden">
+                        <span class="relative z-10">See The Strategy</span>
+                        <div class="absolute inset-0 h-full w-full bg-red transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Strategy -->
+        <section id="strategy" class="py-20 bg-white/80 border-y-4 border-teal relative backdrop-blur-sm">
+            <div class="container mx-auto px-6">
+                <div class="max-w-4xl mx-auto text-center mb-12">
+                    <h2 class="font-serif text-4xl md:text-5xl font-bold text-teal mb-4">The Campaign Simulator</h2>
+                    <p class="text-lg md:text-xl text-gray-600 leading-relaxed">Advertising isn't guesswork; it's engineering. Simulate your impact.</p>
+                </div>
+                <div class="bg-cream border-4 border-teal rounded-3xl p-6 md:p-10 shadow-retro relative">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-1 space-y-8 bg-white p-6 rounded-xl border-2 border-teal/10">
+                            <h3 class="font-serif text-2xl text-red font-bold border-b-2 border-mustard pb-2">Input Parameters</h3>
+                            <div>
+                                <label class="block font-bold text-teal mb-2 flex justify-between"><span>Monthly Budget</span><span id="budgetValue" class="text-red">$5,000</span></label>
+                                <input type="range" id="budgetSlider" min="1000" max="50000" step="1000" value="5000" class="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-teal mb-2 flex justify-between"><span>Digital Intensity</span><span id="mixValue" class="text-red">Balanced</span></label>
+                                <input type="range" id="mixSlider" min="0" max="100" step="10" value="50" class="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red">
+                            </div>
+                            <div class="bg-mustard/20 p-4 rounded-lg border-l-4 border-mustard">
+                                <h4 class="font-bold text-teal text-sm mb-1">Projected ROI</h4>
+                                <p id="roiText" class="text-2xl font-black text-red">3.5x</p>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 flex flex-col justify-center">
+                            <div class="chart-container">
+                                <canvas id="strategyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services -->
+        <section id="services" class="py-20 relative">
+            <div class="container mx-auto px-6 relative">
+                <div class="mb-16 text-center">
+                    <span class="bg-red text-cream px-4 py-1 rounded-full text-sm font-bold tracking-widest uppercase mb-4 inline-block shadow-sm">The Offer</span>
+                    <h2 class="font-serif text-4xl md:text-6xl font-bold text-teal">Our Recipes for Success</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Service Items -->
+                    <div class="bg-cream p-8 border-4 border-teal shadow-retro hover:shadow-retro-hover hover:translate-x-[2px] hover:translate-y-[2px] transition-all group cursor-pointer service-card" data-service="web">
+                        <div class="w-12 h-12 bg-red text-cream flex items-center justify-center font-serif font-bold text-xl rounded-full mb-6 group-hover:bg-mustard group-hover:text-teal transition-colors">01</div>
+                        <h3 class="font-serif text-2xl font-bold text-teal mb-3">Modern Webdesign</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">Aesthetics meet conversion. We build digital storefronts that look like art galleries and sell like supermarkets.</p>
+                    </div>
+                    <div class="bg-cream p-8 border-4 border-teal shadow-retro hover:shadow-retro-hover hover:translate-x-[2px] hover:translate-y-[2px] transition-all group cursor-pointer service-card" data-service="copy">
+                        <div class="w-12 h-12 bg-red text-cream flex items-center justify-center font-serif font-bold text-xl rounded-full mb-6 group-hover:bg-mustard group-hover:text-teal transition-colors">02</div>
+                        <h3 class="font-serif text-2xl font-bold text-teal mb-3">Copywriting</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">Voice that cuts through the noise. We write headlines that stop the scroll.</p>
+                    </div>
+                    <div class="bg-cream p-8 border-4 border-teal shadow-retro hover:shadow-retro-hover hover:translate-x-[2px] hover:translate-y-[2px] transition-all group cursor-pointer service-card" data-service="google">
+                        <div class="w-12 h-12 bg-red text-cream flex items-center justify-center font-serif font-bold text-xl rounded-full mb-6 group-hover:bg-mustard group-hover:text-teal transition-colors">03</div>
+                        <h3 class="font-serif text-2xl font-bold text-teal mb-3">Google & Bing Ads</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">Search dominance. Be the answer when your customers are asking the question.</p>
+                    </div>
+                    <div class="bg-cream p-8 border-4 border-teal shadow-retro hover:shadow-retro-hover hover:translate-x-[2px] hover:translate-y-[2px] transition-all group cursor-pointer service-card" data-service="facebook">
+                        <div class="w-12 h-12 bg-red text-cream flex items-center justify-center font-serif font-bold text-xl rounded-full mb-6 group-hover:bg-mustard group-hover:text-teal transition-colors">04</div>
+                        <h3 class="font-serif text-2xl font-bold text-teal mb-3">Facebook Ads</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">Social targeting precision. We turn strangers into brand loyalists.</p>
+                    </div>
+                    <div class="bg-cream p-8 border-4 border-teal shadow-retro hover:shadow-retro-hover hover:translate-x-[2px] hover:translate-y-[2px] transition-all group cursor-pointer service-card" data-service="ugc">
+                        <div class="w-12 h-12 bg-red text-cream flex items-center justify-center font-serif font-bold text-xl rounded-full mb-6 group-hover:bg-mustard group-hover:text-teal transition-colors">05</div>
+                        <h3 class="font-serif text-2xl font-bold text-teal mb-3">UGC Content</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">Authenticity scales. Leverage user-generated content strategies.</p>
+                    </div>
+                    <div class="bg-teal p-8 border-4 border-teal shadow-retro-red flex flex-col justify-center items-center text-center">
+                        <h3 class="font-serif text-2xl font-bold text-cream mb-4">Need a Custom Mix?</h3>
+                        <button class="px-6 py-2 bg-mustard text-teal font-bold rounded-full hover:bg-white transition-colors scroll-to-contact">Let's Talk</button>
+                    </div>
+                </div>
+                <div id="serviceDetailPanel" class="hidden mt-12 bg-white border-2 border-teal p-8 rounded-xl shadow-lg animate-fade-in transition-all">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 id="detailTitle" class="font-serif text-3xl font-bold text-red">Service Title</h3>
+                        <button id="closeDetailBtn" class="text-teal font-bold hover:text-red">✕ CLOSE</button>
+                    </div>
+                    <p id="detailText" class="text-lg text-gray-700 leading-relaxed">Service details go here.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Preview Section (NOW CLICKABLE LINKS) -->
+        <section id="portfolio" class="py-24 bg-white/90 relative border-t-4 border-teal">
+            <div class="container mx-auto px-6">
+                <div class="mb-16 border-b-4 border-teal pb-8 flex flex-col md:flex-row justify-between items-end">
+                    <h2 class="font-serif text-6xl md:text-8xl font-black text-teal leading-none">OUR <br><span class="text-red">WORK</span></h2>
+                    <p class="text-teal font-bold uppercase tracking-widest mt-4 md:mt-0 text-sm md:text-right max-w-xs">Curated success stories from the digital frontier.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-20">
+                    <!-- Project 1 (Link) -->
+                    <a href="https://example.com" target="_blank" rel="noopener noreferrer" class="group cursor-pointer portfolio-item block">
+                        <div class="w-full aspect-[4/3] bg-teal relative overflow-hidden shadow-retro transition-all duration-300 group-hover:shadow-retro-hover group-hover:translate-x-[4px] group-hover:translate-y-[4px]">
+                            <div class="absolute inset-4 bg-cream flex flex-col portfolio-img transition-transform duration-500 ease-out">
+                                <div class="h-8 border-b-2 border-teal flex items-center px-2 space-x-2"><div class="w-3 h-3 rounded-full bg-red"></div><div class="w-3 h-3 rounded-full bg-mustard"></div></div>
+                                <div class="flex-1 p-4 flex flex-col justify-center items-center"><div class="w-32 h-32 rounded-full border-4 border-teal flex items-center justify-center mb-4"><span class="font-serif text-4xl text-teal font-bold">A</span></div><div class="w-3/4 h-4 bg-teal/20 mb-2"></div><div class="w-1/2 h-4 bg-teal/20"></div></div>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-between items-baseline border-b border-gray-300 pb-2"><h3 class="font-serif text-3xl font-bold text-teal group-hover:text-red transition-colors">General Machine Shop</h3><span class="text-sm font-bold text-gray-500 uppercase tracking-wider">Web Design</span></div>
+                    </a>
+                    <!-- Project 2 (Link) -->
+                    <a href="https://example.com" target="_blank" rel="noopener noreferrer" class="group cursor-pointer portfolio-item block md:mt-24">
+                        <div class="w-full aspect-[4/3] bg-mustard relative overflow-hidden shadow-retro-red transition-all duration-300 group-hover:shadow-retro-hover group-hover:translate-x-[4px] group-hover:translate-y-[4px]">
+                            <div class="absolute inset-4 bg-teal flex flex-col portfolio-img transition-transform duration-500 ease-out">
+                                <div class="h-8 border-b-2 border-cream/20 flex items-center px-2 space-x-2"><div class="w-20 h-2 bg-cream/40 rounded"></div></div>
+                                <div class="flex-1 p-4 grid grid-cols-2 gap-2"><div class="bg-cream/10 h-full"></div><div class="bg-cream/10 h-full"></div></div>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-between items-baseline border-b border-gray-300 pb-2"><h3 class="font-serif text-3xl font-bold text-teal group-hover:text-red transition-colors">Hyattsville Auto Body II</h3><span class="text-sm font-bold text-gray-500 uppercase tracking-wider">Branding</span></div>
+                    </a>
+                    <!-- Project 3 (Link) -->
+                    <a href="https://example.com" target="_blank" rel="noopener noreferrer" class="group cursor-pointer portfolio-item block">
+                        <div class="w-full aspect-[4/3] bg-sienna relative overflow-hidden shadow-retro-mustard transition-all duration-300 group-hover:shadow-retro-hover group-hover:translate-x-[4px] group-hover:translate-y-[4px]">
+                            <div class="absolute inset-4 bg-cream flex flex-col portfolio-img transition-transform duration-500 ease-out">
+                                <div class="flex-1 flex items-center justify-center p-8"><div class="text-center"><div class="text-4xl font-black text-teal mb-2">SALE</div><div class="px-4 py-2 bg-red text-white font-bold inline-block">50% OFF</div></div></div>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-between items-baseline border-b border-gray-300 pb-2"><h3 class="font-serif text-3xl font-bold text-teal group-hover:text-red transition-colors">Beltsville Steel</h3><span class="text-sm font-bold text-gray-500 uppercase tracking-wider">PPC Campaign</span></div>
+                    </a>
+                    <!-- Project 4 (Link) -->
+                    <a href="https://example.com" target="_blank" rel="noopener noreferrer" class="group cursor-pointer portfolio-item block md:mt-24">
+                        <div class="w-full aspect-[4/3] bg-red relative overflow-hidden shadow-retro transition-all duration-300 group-hover:shadow-retro-hover group-hover:translate-x-[4px] group-hover:translate-y-[4px]">
+                            <div class="absolute inset-4 bg-teal flex flex-col portfolio-img transition-transform duration-500 ease-out"><div class="flex-1 p-8 text-cream/80 font-serif italic text-2xl leading-relaxed text-center flex items-center">"The future is just a drive away."</div></div>
+                        </div>
+                        <div class="mt-6 flex justify-between items-baseline border-b border-gray-300 pb-2"><h3 class="font-serif text-3xl font-bold text-teal group-hover:text-red transition-colors">J.R. Welding</h3><span class="text-sm font-bold text-gray-500 uppercase tracking-wider">Copywriting</span></div>
+                    </a>
+                </div>
+                
+                <div class="mt-20 text-center">
+                    <button id="view-archive-btn" class="inline-block border-2 border-teal text-teal px-12 py-4 font-bold uppercase tracking-widest hover:bg-teal hover:text-cream transition-colors">
+                        View Full Archive
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- About -->
+        <section id="about" class="py-24 bg-teal text-cream relative overflow-hidden">
+            <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-10">
+                <div class="order-2 md:order-1 space-y-6">
+                    <h2 class="font-serif text-5xl md:text-6xl font-black text-mustard leading-none">THE DRAPER<br>OF DIGITAL.</h2>
+                    <div class="h-2 w-24 bg-red"></div>
+                    <p class="text-xl leading-relaxed text-cream/90 font-light">Meet <strong class="text-white">Richard Hutchinson</strong>. In a world of algorithms, he brings the human touch back to advertising.</p>
+                </div>
+                <div class="order-1 md:order-2 flex justify-center">
+                    <div class="relative w-80 h-96 bg-mustard rounded-tl-[100px] rounded-br-[100px] border-4 border-cream shadow-[10px_10px_0px_0px_rgba(241,250,238,0.2)] flex items-center justify-center overflow-hidden">
+                        <div class="absolute inset-0 bg-red/20 mix-blend-multiply"></div>
+                        <div class="text-teal font-serif font-bold text-center p-8"><span class="text-6xl block mb-4">RH</span><span class="text-sm uppercase tracking-widest">Richard Hutchinson</span><br><span class="text-xs opacity-70">Owner & Founder</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ARCHIVE VIEW (Hidden by default, NOW CLICKABLE LINKS) -->
+    <main id="archive-view" class="hidden min-h-screen pt-10">
+        <div class="container mx-auto px-6 py-12">
+            <button class="mb-8 flex items-center text-teal font-bold uppercase tracking-widest hover:text-red transition-colors back-home-btn">
+                &larr; Back to Home
+            </button>
+            
+            <div class="mb-16 border-b-4 border-red pb-8">
+                <h1 class="font-serif text-6xl md:text-8xl font-black text-teal leading-none">THE <br><span class="text-red">ARCHIVE</span></h1>
+                <p class="text-teal font-bold mt-4 max-w-xl">A complete collection of digital artifacts, campaigns, and experiences crafted by Red Advertising LLC.</p>
+            </div>
+
+            <!-- Expanded Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Archive Item 1 (Link) -->
+                <a href="https://general-machine.netlify.app" target="_blank" rel="noopener noreferrer" class="group cursor-pointer portfolio-item block">
+                    <div class="w-full aspect-square bg-teal relative overflow-hidden shadow-retro mb-4">
+                        <div class="absolute inset-2 bg-cream flex items-center justify-center portfolio-img transition-transform duration-500"><span class="font-serif text-6xl text-teal font-bold">AF</span></div>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-teal">General Machine Shop</h3>
+                    <p class="text-xs uppercase tracking-wider text-gray-500">Web Design</p>
+                </a>
+                <!-- Archive Item 2 (Link) -->
+                <a href="https://hyattsville-auto.netlify.app" target="_blank" rel="noopener noreferrer" class="group cursor-pointer portfolio-item block">
+                    <div class="w-full aspect-square bg-mustard relative overflow-hidden shadow-retro mb-4">
+                        <div class="absolute inset-2 bg-teal flex items-center justify-center portfolio-img transition-transform duration-500"><span class="font-serif text-6xl text-mustard font-bold">OC</span></div>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-teal">Hyattsville Auto Body II</h3>
+                    <p class="text-xs uppercase tracking-wider text-gray-500">Web Design</p>
+                </a>
+                <!-- Archive Item 3 (Link) -->
+                <a href="https://beltsville-steel.netlify.app" target="_blank" rel="noopener noreferrer" class="group cursor-pointer portfolio-item block">
+                    <div class="w-full aspect-square bg-sienna relative overflow-hidden shadow-retro mb-4">
+                        <div class="absolute inset-2 bg-cream flex items-center justify-center portfolio-img transition-transform duration-500"><span class="font-serif text-6xl text-sienna font-bold">ZR</span></div>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-teal">Beltsville Steel</h3>
+                    <p class="text-xs uppercase tracking-wider text-gray-500">Web Design</p>
+                </a>
+                <!-- Archive Item 4 (Link) -->
+                <a href="https://rayfield-coach.netlify.app" target="_blank" rel="noopener noreferrer" class="group cursor-pointer portfolio-item block">
+                    <div class="w-full aspect-square bg-red relative overflow-hidden shadow-retro mb-4">
+                        <div class="absolute inset-2 bg-teal flex items-center justify-center portfolio-img transition-transform duration-500"><span class="font-serif text-6xl text-red font-bold">LE</span></div>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-teal">Rayfield Coaching</h3>
+                    <p class="text-xs uppercase tracking-wider text-gray-500">Web Design</p>
+                </a>
+                <!-- Archive Item 5 (Link) -->
+                <a href="https://welding-ite.netlify.app" target="_blank" rel="noopener noreferrer" class="group cursor-pointer portfolio-item block">
+                    <div class="w-full aspect-square bg-cream border-4 border-teal relative overflow-hidden shadow-retro mb-4">
+                        <div class="absolute inset-2 bg-red flex items-center justify-center portfolio-img transition-transform duration-500"><span class="font-serif text-6xl text-cream font-bold">VS</span></div>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-teal">JR Welding</h3>
+                    <p class="text-xs uppercase tracking-wider text-gray-500">Web Design</p>
+                </a>
+                <!-- Archive Item 6 (Link) -->
+                <a href="https://affordable-90s-accounting.netlify.app" target="_blank" rel="noopener noreferrer" class="group cursor-pointer portfolio-item block">
+                    <div class="w-full aspect-square bg-teal relative overflow-hidden shadow-retro mb-4">
+                        <div class="absolute inset-2 bg-mustard flex items-center justify-center portfolio-img transition-transform duration-500"><span class="font-serif text-6xl text-teal font-bold">CC</span></div>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-teal">Affordable Accounting 90s</h3>
+                    <p class="text-xs uppercase tracking-wider text-gray-500">Web Design</p>
+                </a>
+                <!-- Archive Item 7 (Link) -->
+                <a href="https://rayfieldcoaching.com/" target="_blank" rel="noopener noreferrer" class="group cursor-pointer portfolio-item block">
+                    <div class="w-full aspect-square bg-sienna relative overflow-hidden shadow-retro mb-4">
+                        <div class="absolute inset-2 bg-teal flex items-center justify-center portfolio-img transition-transform duration-500"><span class="font-serif text-6xl text-cream font-bold">RR</span></div>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-teal">Rayfield Coaching (Old Version)</h3>
+                    <p class="text-xs uppercase tracking-wider text-gray-500">Web Design</p>
+                </a>
+                <!-- Archive Item 8 (Link) -->
+                <a href="https://arrianas-gold.netlify.app" target="_blank" rel="noopener noreferrer" class="group cursor-pointer portfolio-item block">
+                    <div class="w-full aspect-square bg-red relative overflow-hidden shadow-retro mb-4">
+                        <div class="absolute inset-2 bg-cream flex items-center justify-center portfolio-img transition-transform duration-500"><span class="font-serif text-6xl text-red font-bold">PS</span></div>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-teal">Arianna's Gold Exchange</h3>
+                    <p class="text-xs uppercase tracking-wider text-gray-500">Web Design</p>
+                </a>
+            </div>
+            
+            <div class="mt-16 text-center">
+                <button class="px-8 py-3 bg-teal text-cream font-bold uppercase tracking-widest hover:bg-red transition-colors back-home-btn">Return to Main Site</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact" class="bg-cream pt-20 pb-10 border-t-8 border-red relative z-10">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+                <div>
+                    <h2 class="font-serif text-5xl font-bold text-teal mb-2">Let's Make History.</h2>
+                    <p class="text-gray-500 mb-8">Ready to start the campaign? Fill out the brief.</p>
+                    <form class="space-y-6" onsubmit="event.preventDefault(); alert('Campaign Request Received. Richard will be in touch.');">
+                        <div><label class="block text-teal font-bold uppercase text-xs tracking-wider mb-1">Name</label><input type="text" class="w-full bg-white border-b-2 border-teal p-3 focus:outline-none focus:border-red transition-colors" placeholder="Don Draper"></div>
+                        <div><label class="block text-teal font-bold uppercase text-xs tracking-wider mb-1">Email</label><input type="email" class="w-full bg-white border-b-2 border-teal p-3 focus:outline-none focus:border-red transition-colors" placeholder="don@scdp.com"></div>
+                        <div><label class="block text-teal font-bold uppercase text-xs tracking-wider mb-1">Message</label><textarea rows="3" class="w-full bg-white border-b-2 border-teal p-3 focus:outline-none focus:border-red transition-colors" placeholder="I want to buy the world a Coke..."></textarea></div>
+                        <button type="submit" class="w-full py-4 bg-teal text-cream font-bold uppercase tracking-widest hover:bg-red transition-colors shadow-retro hover:shadow-retro-hover btn-click-effect">Send Telegram</button>
+                    </form>
+                </div>
+                <div class="flex flex-col justify-between">
+                    <div class="space-y-8">
+                        <div><h3 class="font-serif text-xl font-bold text-red mb-2">Direct Line</h3><div class="inline-block border-2 border-dashed border-teal/30 px-4 py-2 bg-mustard/10 transform -rotate-2"><span class="font-mono text-teal font-bold">To Be Determined</span></div></div>
+                        <div><h3 class="font-serif text-xl font-bold text-red mb-2">Headquarters</h3><p class="text-teal font-medium">Red Advertising LLC.</p><p class="text-gray-500">United States of America</p></div>
+                    </div>
+                    <div class="mt-12 md:mt-0 pt-8 border-t border-gray-200"><div class="flex justify-between items-center text-sm text-gray-400"><p>&copy; 2025 Red Advertising LLC.</p><p class="font-serif italic">Est. 2025</p></div></div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // View Switching Logic
+            const homeView = document.getElementById('home-view');
+            const archiveView = document.getElementById('archive-view');
+            const viewArchiveBtn = document.getElementById('view-archive-btn');
+            const backHomeBtns = document.querySelectorAll('.back-home-btn, .nav-link-home');
+            
+            // Switch to Archive
+            viewArchiveBtn.addEventListener('click', () => {
+                homeView.classList.add('hidden');
+                archiveView.classList.remove('hidden');
+                archiveView.classList.add('fade-in');
+                window.scrollTo(0,0);
+            });
+
+            // Switch to Home
+            backHomeBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // Only prevent default if it's strictly a view switch logic, 
+                    // otherwise let anchor links scroll to sections
+                    if(archiveView.classList.contains('hidden') === false) {
+                        archiveView.classList.add('hidden');
+                        homeView.classList.remove('hidden');
+                        homeView.classList.add('fade-in');
+                        window.scrollTo(0,0);
+                    }
+                });
+            });
+
+            // Specific Logic for Contact Buttons
+            document.querySelectorAll('.scroll-to-contact').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if(!archiveView.classList.contains('hidden')) {
+                         archiveView.classList.add('hidden');
+                         homeView.classList.remove('hidden');
+                    }
+                    document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            // Standard Mobile Menu
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    if (this.getAttribute('href') !== "#") {
+                        e.preventDefault();
+                        mobileMenu.classList.add('hidden');
+                        document.querySelector(this.getAttribute('href')).scrollIntoView({behavior: 'smooth'});
+                    }
+                });
+            });
+
+            // Services Details
+            const serviceData = {
+                'web': "Our web design process prioritizes user experience (UX) and conversion rate optimization (CRO).",
+                'copy': "Words matter. Our copywriting service includes landing page copy, ad scripts, and email sequences.",
+                'google': "We manage end-to-end Google Ads campaigns. From keyword research to bid management.",
+                'facebook': "Targeting based on interests, behaviors, and demographics. We create scroll-stopping creatives.",
+                'ugc': "We connect you with creators to produce authentic content that looks native to the platform."
+            };
+            const serviceCards = document.querySelectorAll('.service-card');
+            const detailPanel = document.getElementById('serviceDetailPanel');
+            const detailTitle = document.getElementById('detailTitle');
+            const detailText = document.getElementById('detailText');
+            const closeDetailBtn = document.getElementById('closeDetailBtn');
+
+            serviceCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const serviceKey = card.getAttribute('data-service');
+                    detailTitle.innerText = card.querySelector('h3').innerText;
+                    detailText.innerText = serviceData[serviceKey];
+                    detailPanel.classList.remove('hidden');
+                    detailPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                });
+            });
+            closeDetailBtn.addEventListener('click', () => detailPanel.classList.add('hidden'));
+
+            // Chart Logic
+            const ctx = document.getElementById('strategyChart').getContext('2d');
+            let budget = 5000;
+            let mix = 50;
+
+            const strategyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Search Reach', 'Social Reach', 'Brand Awareness', 'Direct Leads'],
+                    datasets: [{
+                        label: 'Projected Monthly Impact',
+                        data: calculateData(budget, mix),
+                        backgroundColor: ['#E63946', '#264653', '#E9C46A', '#F4A261'],
+                        borderWidth: 0,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#e5e5e5' }, ticks: { font: { family: 'Montserrat' } } },
+                        x: { grid: { display: false }, ticks: { font: { family: 'Montserrat', weight: 'bold' }, color: '#264653' } }
+                    }
+                }
+            });
+
+            function calculateData(budget, mix) {
+                const paidFactor = mix / 100;
+                const organicFactor = 1 - paidFactor;
+                return [
+                    Math.floor((budget * 0.4) + (budget * 0.8 * paidFactor)),
+                    Math.floor((budget * 0.5) + (budget * 1.2 * paidFactor)),
+                    Math.floor((budget * 0.3) + (budget * 2.0 * organicFactor)),
+                    Math.floor((budget * 0.05) + (budget * 0.1 * paidFactor))
+                ];
+            }
+
+            function updateROI(budget, mix) {
+                const efficiency = budget > 20000 ? 0.9 : 1.1;
+                const distance = Math.abs(mix - 60);
+                let finalROI = (2.0 + (1 - distance * 0.02)) * efficiency;
+                if (finalROI < 1) finalROI = 1.1;
+                document.getElementById('roiText').innerText = finalROI.toFixed(1) + 'x';
+            }
+
+            const budgetSlider = document.getElementById('budgetSlider');
+            const mixSlider = document.getElementById('mixSlider');
+
+            function updateDashboard() {
+                budget = parseInt(budgetSlider.value);
+                mix = parseInt(mixSlider.value);
+                document.getElementById('budgetValue').innerText = '$' + budget.toLocaleString();
+                document.getElementById('mixValue').innerText = mix < 30 ? "Organic Focus" : (mix > 70 ? "Paid Aggressive" : "Balanced");
+                strategyChart.data.datasets[0].data = calculateData(budget, mix);
+                strategyChart.update();
+                updateROI(budget, mix);
+            }
+
+            budgetSlider.addEventListener('input', updateDashboard);
+            mixSlider.addEventListener('input', updateDashboard);
+        });
+    </script>
+</body>
+</html>

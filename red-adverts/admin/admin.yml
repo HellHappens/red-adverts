@@ -1,0 +1,25 @@
+backend:
+  name: git-gateway
+  branch: main # or master
+
+media_folder: "images/uploads" # Where your uploaded logos will be stored
+public_folder: "/images/uploads"
+
+collections:
+  - name: "archive"
+    label: "Portfolio Archive"
+    files:
+      - file: "index.html"
+        label: "Archive Page"
+        name: "archive_content"
+        fields:
+          - {label: "Archive Items", name: "items", widget: "list", fields: [
+              {label: "Company Name", name: "company", widget: "string"},
+              {label: "Logo Image", name: "logo", widget: "image"},
+              {label: "Link", name: "link", widget: "string"}
+            ]}
+
+            backend:
+  name: github
+  repo: your-username/your-repo-name # Replace with your actual repo
+  branch: main
