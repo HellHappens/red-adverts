@@ -1,0 +1,28 @@
+# 1. Backend: This connects the CMS to your new GitHub repository
+backend:
+  name: github
+  repo: YourGitHubUsername/red-advertising-site # REPLACE THIS with your actual GitHub username and repo name
+  branch: main # The default branch you uploaded your files to
+
+# 2. Media: This is where the CMS will save the logo images you upload
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+# 3. Collections: This defines what parts of your site you can edit
+collections:
+  - name: "archive"
+    label: "Portfolio Archive"
+    files:
+      - file: "index.html" # The file the CMS will edit
+        label: "Main Website"
+        name: "home_page"
+        fields:
+          - label: "Archive Items"
+            name: "archive_list"
+            widget: "list"
+            summary: "{{fields.company}}"
+            fields:
+              - {label: "Company Name", name: "company", widget: "string"}
+              - {label: "Service Type", name: "service", widget: "string", default: "Web Design"}
+              - {label: "Live Link", name: "link", widget: "string"}
+              - {label: "Logo/Image", name: "logo", widget: "image"}
